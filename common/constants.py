@@ -11,11 +11,6 @@
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-ALGORITHM_VERSION = '0.1.0'
-"""
-Current version of the algorithm.
-"""
-
 IMAGE_SIZE = (48, 48)
 """
 Target size to which all input images are resized, The tuple represents (height, width) in pixels. 

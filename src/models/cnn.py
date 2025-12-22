@@ -1,8 +1,9 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
 from typing import TYPE_CHECKING
+from keras import optimizers
 from keras.models import Sequential
-from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, RandomRotation, RandomFlip, RandomBrightness
 
 if TYPE_CHECKING:
     import tensorflow as tf
@@ -18,6 +19,22 @@ from common.constants import IMAGE_SIZE
 # ---------------------------------------------------------------------------------------------------------------------
 
 __all__ = ['build_model', 'train_model']
+
+ROTATION = 0.5
+"""
+Defines the maximum rotation factor applied during data augmentation.
+
+A value of 0.5 allows for random rotations of up to approximately 50% of a full turn, which helps the model to be 
+more robust against variations in head orientation and small misalignments in faces.
+"""
+
+BRIGHTNESS = 0.1
+"""
+Defines the range of brightness variation applied during data augmentation.
+
+A value of 0.1 introduces small random modifications to the brightness of the images, simulating different lighting 
+conditions and improving the model's generalization ability in real environments.
+"""
 
 INPUT_SHAPE = (IMAGE_SIZE[0], IMAGE_SIZE[1], 1)
 """
@@ -80,14 +97,6 @@ This value must match the number of categories present in the dataset. It is use
 in the output layer of the model.
 """
 
-OPTIMIZER = 'adam'
-"""
-Optimizer used during the model training process.
-
-The Adam optimizer combines momentum and learning rate adaptation techniques to achieve efficient convergence across 
-a wide variety of problems.
-"""
-
 LOSS = 'sparse_categorical_crossentropy'
 """
 Loss function used for model training.
@@ -102,7 +111,7 @@ List of metrics evaluated during training and validation.
 - The `accuracy` metric measures the proportion of correct predictions made by the model.
 """
 
-EPOCHS = 5
+EPOCHS = 10
 """
 Number of epochs used during model training.
 
@@ -111,17 +120,33 @@ One epoch corresponds to one complete pass through the training dataset.
 
 def build_model() -> Sequential:
     """
-    Build and compile a convolutional model for image classification.
+    Build and compile a Convolutional Neural Network (CNN) model for facial emotion detection.
 
-    The model is designed to work with grayscale images and produce a 
-    probability distribution over `NUM_CLASSES` classes.
+    The model incorporates a data augmentation phase that is applied exclusively during training, 
+    followed by a lightweight CNN architecture designed to balance accuracy and computational efficiency.
+
+    Data augmentation techniques used:
+        - Random rotation to simulate variations in head position.
+        - Horizontal flipping to improve left-right invariance.
+        - Brightness adjustment to simulate different lighting conditions.
+
+    The model is compiled using the Adam optimizer with a reduced learning rate, allowing for more stable 
+    convergence during training.
 
     Returns:
         Sequential:
             Keras model compiled and ready to be trained.
     """
+    augmentation = Sequential([
+        RandomRotation(ROTATION),
+        RandomFlip('horizontal'),
+        RandomBrightness(BRIGHTNESS),
+    ])
+
     model = Sequential([
         Input(shape=INPUT_SHAPE),
+
+        augmentation, # Data increase applied only during training
 
         Conv2D(CONV_FILTERS[0], KERNEL_SIZE, activation=ACTIVATION_CONV),
         MaxPooling2D(POOL_SIZE),
@@ -135,7 +160,7 @@ def build_model() -> Sequential:
     ])
 
     model.compile(
-        optimizer=OPTIMIZER,
+        optimizer=optimizers.Adam(learning_rate=0.0005),
         loss=LOSS,
         metrics=METRICS
     )

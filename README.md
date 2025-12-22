@@ -2,15 +2,21 @@
 
 ## 🧾 Project description
 
-...
+The main objective of the project is to design and implement a system based on convolutional neural networks (CNNs) capable of recognizing human emotions from facial images captured in real time by cameras.
+
+The system allows basic emotions such as happiness, sadness, anger, surprise, fear, disgust, and neutrality to be classified using modern computer vision and deep learning techniques. Special attention is paid to real-time performance, model accuracy, and robustness to variations in lighting and subjects.
 
 ## 📑 Context
 
-...
+Automatic facial emotion detection is a key area within artificial intelligence and human-computer interaction, with direct applications in fields such as customer service, security, behavior analysis, and personalized recommendation systems.
+
+Recent advances in deep learning, and in particular in CNNs, have significantly improved the ability of systems to interpret facial expressions with high levels of accuracy. However, many existing approaches have limitations in real-world scenarios, especially in changing lighting conditions or when real-time processing is required.
 
 ## 🛠️ Key features
 
-...
+- Real-time facial emotion recognition system based on video captured by camera.
+- Classification of 7 basic emotions: happiness, sadness, anger, surprise, fear, disgust, and neutral.
+- Model based on convolutional neural networks (CNNs) trained for computer vision tasks.
 
 ## 💽 Installation (Windows)
 
@@ -46,10 +52,18 @@ pip install -r requirements.txt
 
 ## 🚀 Execution
 
-### Console
+### Operating requirements
+
+This project uses TensorFlow and Deep Learning libraries, so it is essential to use a compatible version of Python. 
+
+Recent versions such as Python ``3.12.x``, `3.13.x`, and `3.14.x` are not currently compatible with TensorFlow. This is because many libraries in the ML ecosystem are 2 or 3 versions behind Python.
+
+> [!NOTE]
+> This project was developed using version 3.11.9, which is stable for TensorFlow, Keras, and NumPy.
+
+### Running through the console
 
 To run the application from the console, you can use the following command:
-
 ```sh
 python main.py
 ```
@@ -60,7 +74,7 @@ The main files are organized into:
 
 ```
 facial-emotion-detection/
-├── CK+48/...                   # Data set containing images of human faces grouped by folder
+├── CK+48/...                   # Dataset containing images of human faces grouped by folder
 ├── common
 │   └── constants.py
 ├── src
