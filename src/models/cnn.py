@@ -1,9 +1,14 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+import numpy as np
 from typing import TYPE_CHECKING
 from keras import optimizers
 from keras.models import Sequential
-from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, RandomRotation, RandomFlip, RandomBrightness
+from sklearn.utils.class_weight import compute_class_weight
+from keras.layers import (
+    Input, Conv2D, MaxPooling2D, Flatten, Dense, RandomRotation, 
+    RandomFlip, RandomBrightness, BatchNormalization, Dropout
+)
 
 if TYPE_CHECKING:
     import tensorflow as tf
@@ -27,6 +32,11 @@ Kernel size used in convolutional layers.
 POOL_SIZE = (2, 2)
 """
 Size of the pooling window used in max pooling layers.
+"""
+
+MAX_WEIGHT = 5
+"""
+Maximum weight allowed for a class during training.
 """
 
 def build_model() -> Sequential:
@@ -60,13 +70,18 @@ def build_model() -> Sequential:
         augmentation, # Data increase applied only during training
 
         Conv2D(filters=32, kernel_size=KERNEL_SIZE, activation='relu'),
+        BatchNormalization(),
         MaxPooling2D(pool_size=POOL_SIZE),
+        Dropout(rate=0.25),
 
         Conv2D(filters=64, kernel_size=KERNEL_SIZE, activation='relu'),
+        BatchNormalization(),
         MaxPooling2D(pool_size=POOL_SIZE),
+        Dropout(rate=0.25),
 
         Flatten(),
         Dense(units=128, activation='relu'),
+        Dropout(rate=0.25),
         Dense(units=NUM_CLASSES, activation='softmax')
     ])
 
@@ -80,10 +95,20 @@ def build_model() -> Sequential:
 
 def train_model(model: Sequential, train_ds: 'tf.data.Dataset', valid_ds: 'tf.data.Dataset') -> None:
     """
-    Train a Keras model using training and validation datasets.
+    Train a Keras model using class weights to mitigate dataset imbalance.
 
-    This function executes the training process by calling `model.fit`, evaluating the model 
-    on the validation set at each epoch and save the model on a specific path.
+    This function automatically calculates the weights for each class from the training set, 
+    using scikit-learn's `compute_class_weight`.
+    
+    It then limits these weights using `MAX_WEIGHT` to avoid extreme values that could negatively 
+    affect training stability.
+
+    **Training process:**
+        - All labels are extracted from the training dataset.
+        - Class weights are calculated in a balanced manner.
+        - The maximum weights are clipped according to `MAX_WEIGHT`.
+        - The model is trained for a fixed number of epochs.
+        - The trained weights are saved in the path defined by `MODEL_PATH`.
 
     Args:
         model (Sequential):
@@ -93,10 +118,28 @@ def train_model(model: Sequential, train_ds: 'tf.data.Dataset', valid_ds: 'tf.da
         valid_ds (tf.data.Dataset):
             Validation dataset used to evaluate model performance during training.
     """
+    labels = []
+    for _, y in train_ds:
+        labels.extend(y.numpy())
+    
+    labels = np.array(labels)
+
+    class_weight = compute_class_weight(
+        class_weight='balanced',
+        classes=np.unique(labels),
+        y=labels
+    )
+
+    class_weight = dict(zip(np.unique(labels), class_weight))
+
+    for k in class_weight:
+        class_weight[k] = min(class_weight[k], MAX_WEIGHT)
+
     model.fit(
         train_ds,
         validation_data=valid_ds,
-        epochs=10
+        epochs=25,
+        class_weight=class_weight
     )
 
     model.save_weights(filepath=MODEL_PATH)
