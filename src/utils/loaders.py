@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 # MODULES (INTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-from common.constants import IMAGE_SIZE
+from common.constants import IMAGE_SIZE, COLOR_MODE
 # ---------------------------------------------------------------------------------------------------------------------
 
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
@@ -32,14 +32,6 @@ Seed used to ensure reproducibility in dataset partitioning.
 
 This value is used during the division between training and validation to ensure that data separation is consistent 
 between  runs.
-"""
-
-COLOR_MODE = 'grayscale'
-"""
-Color mode used when loading images.
-
-The value `grayscale` indicates that images are converted to grayscale, producing a single channel per image. This 
-reduces the dimensionality of the data and is appropriate when color information is not relevant to the problem.
 """
 
 BATCH_SIZE = 32
@@ -81,7 +73,7 @@ def load_datasets() -> Tuple['tf.data.Dataset', 'tf.data.Dataset']:
             Tuple with the training dataset and the validation dataset in that order.
     """
     training = image_dataset_from_directory(
-        DIRECTORY,
+        directory=DIRECTORY,
         validation_split=0.2,
         subset='training',
         seed=SEED,
@@ -91,7 +83,7 @@ def load_datasets() -> Tuple['tf.data.Dataset', 'tf.data.Dataset']:
     )
 
     validation = image_dataset_from_directory(
-        DIRECTORY,
+        directory=DIRECTORY,
         validation_split=0.2,
         subset='validation',
         seed=SEED,

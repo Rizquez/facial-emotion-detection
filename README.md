@@ -74,12 +74,16 @@ The main files are organized into:
 
 ```
 facial-emotion-detection/
-├── CK+48/...                   # Dataset containing images of human faces grouped by folder
+├── assets
+│   └── haarcascade_frontalface_default.xml     # OpenCV Haar Classifier
+├── CK+48/...                                   # Dataset containing images of human faces grouped by folder
 ├── common
 │   └── constants.py
 ├── src
 │   ├── models
 │   │   └── cnn.py
+│   ├── tools
+│   │   └── webcam.py
 │   └── utils
 │       └── loaders.py
 ├── .gitignore
@@ -111,6 +115,7 @@ class MySecondClass:
 ## 📖 Additional documentation
 
 - [CK+ Kaggle](https://www.kaggle.com/datasets/shawon10/ckplus/data)
+- [OpenCV Haar Cascades](https://github.com/kipr/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml)
 
 ## 🔒 License
 
