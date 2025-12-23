@@ -56,7 +56,7 @@ pip install -r requirements.txt
 
 This project uses TensorFlow and Deep Learning libraries, so it is essential to use a compatible version of Python. 
 
-Recent versions such as Python ``3.12.x``, `3.13.x`, and `3.14.x` are not currently compatible with TensorFlow. This is because many libraries in the ML ecosystem are 2 or 3 versions behind Python.
+Recent versions such as Python `3.12.x`, `3.13.x`, and `3.14.x` are not currently compatible with TensorFlow. This is because many libraries in the ML ecosystem are 2 or 3 versions behind Python.
 
 > [!NOTE]
 > This project was developed using version 3.11.9, which is stable for TensorFlow, Keras, and NumPy.
@@ -115,8 +115,8 @@ class MySecondClass:
 
 ## 📖 Additional documentation
 
-- [CK+ Kaggle](https://www.kaggle.com/datasets/shawon10/ckplus/data)
-- [FER Kaggle](https://www.kaggle.com/datasets/ashishpatel26/facial-expression-recognitionferchallenge/data)
+- [CK+ Kaggle](https://www.kaggle.com/code/shawon10/ck-facial-expression-detection)
+- [FER Kaggle](https://www.kaggle.com/code/enesztrk/facial-emotion-recognition-vgg19-fer2013)
 - [OpenCV Haar Cascades](https://github.com/kipr/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml)
 
 ## 🔒 License

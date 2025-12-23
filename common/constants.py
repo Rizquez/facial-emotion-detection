@@ -22,6 +22,7 @@ EMOTION_LABELS = [
     'disgust',
     'fear',
     'happy',
+    'neutral',
     'sadness',
     'surprise'
 ]
@@ -34,9 +35,9 @@ FER_LABELS = {
     1: 2,  # disgust
     2: 3,  # fear
     3: 4,  # happy
-    4: 5,  # sadness
-    5: 6,  # surprise
-    6: 1,  # neutral
+    4: 6,  # sadness
+    5: 7,  # surprise
+    6: 5,  # neutral
 }
 """
 Map for converting labels from the FER dataset to the project's unified class scheme.

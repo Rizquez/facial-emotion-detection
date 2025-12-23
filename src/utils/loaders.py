@@ -10,7 +10,7 @@ from keras.utils import image_dataset_from_directory
 
 # MODULES (INTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-from common.constants import IMAGE_SIZE, COLOR_MODE, SHAPE
+from common.constants import IMAGE_SIZE, COLOR_MODE, SHAPE, FER_LABELS
 # ---------------------------------------------------------------------------------------------------------------------
 
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
@@ -137,7 +137,7 @@ def _load_fer_dataset() -> Tuple[tf.data.Dataset, tf.data.Dataset]:
         pixels = np.array(row['pixels'].split(), dtype=np.uint8)
         image = pixels.reshape(SHAPE)
         images.append(image)
-        labels.append(row['emotion'])
+        labels.append(FER_LABELS[int(row['emotion'])])
 
     images = np.array(images, dtype=np.float32)
     labels = np.array(labels, dtype=np.int32)

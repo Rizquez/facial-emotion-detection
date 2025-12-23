@@ -49,7 +49,7 @@ def build_model() -> Sequential:
             Keras model compiled and ready to be trained.
     """
     augmentation = Sequential([
-        RandomRotation(factor=0.5),
+        RandomRotation(factor=0.05),
         RandomFlip(mode='horizontal'),
         RandomBrightness(factor=0.1),
     ])
