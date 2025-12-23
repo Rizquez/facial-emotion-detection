@@ -75,8 +75,9 @@ The main files are organized into:
 ```
 facial-emotion-detection/
 ├── assets
+│   ├── CK+48/...                               # Dataset containing images of human faces grouped by folder
+│   ├── FER.csv                                 # Dataset containing grayscale images, size 48×48 pixels
 │   └── haarcascade_frontalface_default.xml     # OpenCV Haar Classifier
-├── CK+48/...                                   # Dataset containing images of human faces grouped by folder
 ├── common
 │   └── constants.py
 ├── src
@@ -115,6 +116,7 @@ class MySecondClass:
 ## 📖 Additional documentation
 
 - [CK+ Kaggle](https://www.kaggle.com/datasets/shawon10/ckplus/data)
+- [FER Kaggle](https://www.kaggle.com/datasets/ashishpatel26/facial-expression-recognitionferchallenge/data)
 - [OpenCV Haar Cascades](https://github.com/kipr/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml)
 
 ## 🔒 License

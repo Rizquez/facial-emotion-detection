@@ -25,9 +25,9 @@ from common.constants import MODEL_PATH
 if __name__ == '__main__':
 
     if not os.path.exists(MODEL_PATH):
-        training, validation = load_datasets()
+        train_ds, valid_ds = load_datasets()
         model = build_model()
-        train_model(model, training, validation)
+        train_model(model, train_ds, valid_ds)
 
     run_webcam()
 

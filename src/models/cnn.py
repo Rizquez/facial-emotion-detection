@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 # MODULES (INTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-from common.constants import INPUT_SHAPE, NUM_CLASSES, MODEL_PATH
+from common.constants import SHAPE, NUM_CLASSES, MODEL_PATH
 # ---------------------------------------------------------------------------------------------------------------------
 
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
@@ -22,15 +22,11 @@ __all__ = ['build_model', 'train_model']
 KERNEL_SIZE = (3, 3)
 """
 Kernel size used in convolutional layers.
-
-The tuple represents (height, width) of the convolutional filter applied to the input images.
 """
 
 POOL_SIZE = (2, 2)
 """
 Size of the pooling window used in max pooling layers.
-
-The tuple represents (height, width) of the region over which the spatial reduction operation is applied.
 """
 
 def build_model() -> Sequential:
@@ -59,7 +55,7 @@ def build_model() -> Sequential:
     ])
 
     model = Sequential([
-        Input(shape=INPUT_SHAPE),
+        Input(shape=SHAPE),
 
         augmentation, # Data increase applied only during training
 
@@ -82,7 +78,7 @@ def build_model() -> Sequential:
 
     return model
 
-def train_model(model: Sequential, training: 'tf.data.Dataset', validation: 'tf.data.Dataset') -> None:
+def train_model(model: Sequential, train_ds: 'tf.data.Dataset', valid_ds: 'tf.data.Dataset') -> None:
     """
     Train a Keras model using training and validation datasets.
 
@@ -92,15 +88,14 @@ def train_model(model: Sequential, training: 'tf.data.Dataset', validation: 'tf.
     Args:
         model (Sequential):
             Previously built and compiled Keras model.
-        training (tf.data.Dataset):
+        train_ds (tf.data.Dataset):
             Training dataset that produces batches of images and labels.
-        validation (tf.data.Dataset):
-            Validation dataset used to evaluate model performance
-            during training.
+        valid_ds (tf.data.Dataset):
+            Validation dataset used to evaluate model performance during training.
     """
     model.fit(
-        training,
-        validation_data=validation,
+        train_ds,
+        validation_data=valid_ds,
         epochs=10
     )
 
