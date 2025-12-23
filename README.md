@@ -87,6 +87,7 @@ facial-emotion-detection/
 │   │   └── webcam.py
 │   └── utils
 │       └── loaders.py
+├── .gitattributes
 ├── .gitignore
 ├── LICENSE
 ├── main.py
