@@ -82,11 +82,13 @@ facial-emotion-detection/
 │   └── constants.py
 ├── src
 │   ├── models
-│   │   └── cnn.py
+│   │   ├── cnn.py                              # CNN para CK+
+│   │   └── vgg19.py                            # Transfer learning FER
 │   ├── tools
 │   │   └── webcam.py
 │   └── utils
-│       └── loaders.py
+│       ├── loaders_ck.py
+│       └── loaders_fer.py
 ├── .gitattributes
 ├── .gitignore
 ├── LICENSE
