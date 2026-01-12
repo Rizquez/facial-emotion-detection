@@ -11,56 +11,85 @@ import os
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-MODEL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'keras.weights.h5')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 """
-Absolute path where the weights of the trained model are stored and from where they are loaded.
+# TODO: Documentation
 """
 
-EMOTION_LABELS = [
+CK_PATH = os.path.join(PROJECT_ROOT, 'assets', 'CK+48')
+"""
+# TODO: Documentation
+"""
+
+FER_FILE = os.path.join(PROJECT_ROOT, 'assets', 'FER.csv')
+"""
+# TODO: Documentation
+"""
+
+CASCADE_FILE = os.path.join(PROJECT_ROOT, 'assets', 'haarcascade_frontalface_default.xml')
+"""
+# TODO: Documentation
+"""
+
+CK_WEIGHTS_FILE = os.path.join(PROJECT_ROOT, 'ck.weights.h5')
+"""
+# TODO: Documentation
+"""
+
+FER_WEIGHTS_FILE = os.path.join(PROJECT_ROOT, 'fer.weights.h5')
+"""
+# TODO: Documentation
+"""
+
+CK_EMOTION_LABELS = [
     'anger',
     'contempt',
     'disgust',
     'fear',
     'happy',
-    'neutral',
     'sadness',
     'surprise'
 ]
 """
-List of emotion labels associated with the classes in the model.
+# TODO: Documentation
 """
 
-FER_LABELS = {
-    0: 0,  # anger
-    1: 2,  # disgust
-    2: 3,  # fear
-    3: 4,  # happy
-    4: 6,  # sadness
-    5: 7,  # surprise
-    6: 5,  # neutral
-}
+FER_EMOTION_LABELS = [
+    'anger',
+    'disgust',
+    'fear',
+    'happy',
+    'sadness',
+    'surprise',
+    'neutral'
+]
 """
-Map for converting labels from the FER dataset to the project's unified class scheme.
-"""
-
-IMAGE_SIZE = (48, 48)
-"""
-Target size to which all input images are resized, The tuple represents (height, width) in pixels. 
+# TODO: Documentation
 """
 
-COLOR_MODE = 'grayscale'
+CK_IMAGE_SIZE = (48, 48)
 """
-Color mode used when loading images.
-"""
-
-SHAPE = (IMAGE_SIZE[0], IMAGE_SIZE[1], 1)
-"""
-Expected form of the neural model input.
+# TODO: Documentation
 """
 
-NUM_CLASSES = len(EMOTION_LABELS)
+CK_COLOR_MODE = 'grayscale'
 """
-Total number of classes to be predicted by the model.
+# TODO: Documentation
+"""
+
+FER_IMAGE_SIZE = (96, 96)
+"""
+# TODO: Documentation
+"""
+
+SEED = 42
+"""
+# TODO: Documentation
+"""
+
+BATCH_SIZE = 32
+"""
+# TODO: Documentation
 """
 
 # ---------------------------------------------------------------------------------------------------------------------

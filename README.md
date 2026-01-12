@@ -63,10 +63,16 @@ Recent versions such as Python `3.12.x`, `3.13.x`, and `3.14.x` are not currentl
 
 ### Running through the console
 
-To run the application from the console, you can use the following command:
+To run the application from the console, you can use the following command shown as an example:
 ```sh
-python main.py
+python main.py --source=...
 ```
+
+Where:
+- **source:** Source of data on which the model training will be performed (if necessary).
+
+> [!NOTE]
+> For more details about the parameters and execution arguments, see the file: *main.py*
 
 ## 📂 Project structure
 
@@ -81,14 +87,16 @@ facial-emotion-detection/
 ├── common
 │   └── constants.py
 ├── src
+│   ├── loaders
+│   │   ├── __init__.py
+│   │   ├── ck.py
+│   │   └── fer.py
 │   ├── models
-│   │   ├── cnn.py                              # CNN para CK+
-│   │   └── vgg19.py                            # Transfer learning FER
-│   ├── tools
-│   │   └── webcam.py
-│   └── utils
-│       ├── loaders_ck.py
-│       └── loaders_fer.py
+│   │   ├── __init__.py
+│   │   ├── cnn.py                              # CNN for CK+
+│   │   └── mobilenetv2.py                      # MobileNetV2 (light backbone) for FER
+│   └── webcam
+│       └── activate.py
 ├── .gitattributes
 ├── .gitignore
 ├── LICENSE
@@ -121,6 +129,7 @@ class MySecondClass:
 - [CK+ Kaggle](https://www.kaggle.com/code/shawon10/ck-facial-expression-detection)
 - [FER Kaggle](https://www.kaggle.com/code/enesztrk/facial-emotion-recognition-vgg19-fer2013)
 - [OpenCV Haar Cascades](https://github.com/kipr/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml)
+- [CUDA GPU Compute Capability](https://developer.nvidia.com/cuda/gpus)
 
 ## 🔒 License
 
