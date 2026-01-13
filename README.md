@@ -65,7 +65,7 @@ Recent versions such as Python `3.12.x`, `3.13.x`, and `3.14.x` are not currentl
 
 To run the application from the console, you can use the following command shown as an example:
 ```sh
-python main.py --source=xxx --retrain 2>nul
+python main.py --source=fer --retrain 2>nul
 ```
 
 Where:

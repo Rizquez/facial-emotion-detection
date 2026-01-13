@@ -7,7 +7,6 @@ import mediapipe as mp
 from collections import deque
 from typing import Literal, TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from numpy import ndarray
 # ---------------------------------------------------------------------------------------------------------------------
@@ -37,15 +36,15 @@ MARGIN = 0.20
 # TODO: Documentation
 """
 
-def activate_webcam(mode: Literal['ck', 'fer'] = 'ck') -> None:
+def activate_webcam(source: Literal['ck', 'fer'] = 'ck') -> None:
     """
     # TODO: Documentation
     """
-    mode = mode.lower().strip()
-    if mode not in ('ck', 'fer'):
-        raise ValueError('The mode parameter must be equal to `ck` or `fer`')
+    source = source.lower().strip()
+    if source not in ('ck', 'fer'):
+        raise ValueError('The `source` parameter must be equal to `ck` or `fer`')
     
-    if mode == 'ck':
+    if source == 'ck':
         model = build_ck_model()
         model.load_weights(CK_WEIGHTS_FILE)
         emotion_labels = CK_EMOTION_LABELS
@@ -138,7 +137,7 @@ def activate_webcam(mode: Literal['ck', 'fer'] = 'ck') -> None:
             )
 
 
-        cv2.imshow(f"Emotion detection ({mode})", frame_bgr)
+        cv2.imshow(f"Emotion detection ({source})", frame_bgr)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
