@@ -1,12 +1,8 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-import numpy as np
 import pandas as pd
 import tensorflow as tf
-from typing import Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from numpy import ndarray
+from typing import Tuple
 # ---------------------------------------------------------------------------------------------------------------------
 
 # MODULES (INTERNAL)
@@ -19,59 +15,72 @@ from common.constants import FER_FILE, SEED, BATCH_SIZE, FER_IMAGE_SIZE
 
 __all__ = ['load_fer_datasets']
 
-def load_fer_datasets() -> Tuple[tf.data.Dataset, tf.data.Dataset]:
+def load_fer_datasets() -> Tuple[tf.data.Dataset, tf.data.Dataset, tf.data.Dataset]:
     """
     # TODO: Documentation
     """
     df = pd.read_csv(FER_FILE)
 
-    images = np.stack([_parse_pixels_to_image(pixel) for pixel in df['pixels'].values]).astype(np.float32)
-    labels = df['emotion'].values.astype(np.int32)
+    train_df = df[df['Usage'] == 'Training']
+    valid_df = df[df['Usage'] == 'PublicTest']
+    test_df  = df[df['Usage'] == 'PrivateTest']
 
-    ds = tf.data.Dataset.from_tensor_slices((images, labels))
-    ds = ds.shuffle(buffer_size=2048, seed=SEED, reshuffle_each_iteration=True)
-
-    n_row = len(df)
-    n_train = int(0.8 * n_row)
-    train_ds = ds.take(n_train)
-    valid_ds = ds.skip(n_train)
-
-    def preprocess(image, label):
+    def preprocess(pixels, label):
         """
         # TODO: Documentation
         """
-        image = tf.image.grayscale_to_rgb(image)
-        image = tf.image.resize(image, FER_IMAGE_SIZE)
-        image = tf.cast(image, tf.float32)
-        return image, label
+        parts = tf.strings.split(pixels, ' ')
+        parts = tf.strings.to_number(parts, out_type=tf.float32)
+
+        img = tf.reshape(parts, (48, 48, 1))
+        img = tf.image.grayscale_to_rgb(img)
+        img = tf.image.resize(img, FER_IMAGE_SIZE, method='bilinear')
+
+        return img, label
+
+    train_ds = tf.data.Dataset.from_tensor_slices(
+        tensors=(
+            train_df['pixels'].astype(str).values, 
+            train_df['emotion'].values.astype('int32')
+        )
+    )
+
+    valid_ds = tf.data.Dataset.from_tensor_slices(
+        tensors=(
+            valid_df['pixels'].astype(str).values, 
+            valid_df['emotion'].values.astype('int32')
+        )
+    )
+
+    test_ds = tf.data.Dataset.from_tensor_slices(
+        tensors=(
+            test_df['pixels'].astype(str).values, 
+            test_df['emotion'].values.astype('int32')
+        )
+    )
+
+    train_ds = train_ds.shuffle(
+        buffer_size=len(train_df), 
+        seed=SEED, 
+        reshuffle_each_iteration=True
+    )
 
     train_ds = train_ds.map(
         preprocess, 
         num_parallel_calls=tf.data.AUTOTUNE
-    ).batch(
-        BATCH_SIZE
-    ).prefetch(
-        tf.data.AUTOTUNE
-    )
+    ).batch(BATCH_SIZE).cache().prefetch(tf.data.AUTOTUNE)
 
     valid_ds = valid_ds.map(
         preprocess, 
         num_parallel_calls=tf.data.AUTOTUNE
-    ).batch(
-        BATCH_SIZE
-    ).prefetch(
-        tf.data.AUTOTUNE
-    )
+    ).batch(BATCH_SIZE).cache().prefetch(tf.data.AUTOTUNE)
 
-    return train_ds, valid_ds
+    test_ds = test_ds.map(
+        preprocess, 
+        num_parallel_calls=tf.data.AUTOTUNE
+    ).batch(BATCH_SIZE).cache().prefetch(tf.data.AUTOTUNE)
 
-def _parse_pixels_to_image(pixels: str) -> 'ndarray':
-    """
-    # TODO: Documentation
-    """
-    array_pixels = np.fromstring(pixels, dtype=np.uint8, sep=' ')
-    image = array_pixels.reshape(48, 48, 1)
-    return image
+    return train_ds, valid_ds, test_ds
 
 # ---------------------------------------------------------------------------------------------------------------------
 # END OF FILE

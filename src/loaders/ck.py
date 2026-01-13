@@ -1,16 +1,14 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-from typing import Tuple, TYPE_CHECKING
+import tensorflow as tf
+from typing import Tuple
 from keras.layers import Rescaling
 from keras.utils import image_dataset_from_directory
-
-if TYPE_CHECKING:
-    import tensorflow as tf
 # ---------------------------------------------------------------------------------------------------------------------
 
 # MODULES (INTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-from common.constants import CK_PATH, CK_COLOR_MODE, CK_IMAGE_SIZE, SEED, BATCH_SIZE
+from common.constants import CK_PATH, CK_COLOR_MODE, CK_IMAGE_SIZE, CK_EMOTION_LABELS, SEED, BATCH_SIZE
 # ---------------------------------------------------------------------------------------------------------------------
 
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
@@ -23,7 +21,7 @@ _rescaling = Rescaling(1 / 255)
 # TODO: Documentation
 """
 
-def load_ck_datasets() -> Tuple['tf.data.Dataset', 'tf.data.Dataset']:
+def load_ck_datasets() -> Tuple[tf.data.Dataset, tf.data.Dataset]:
     """
     # TODO: Documentation
     """
@@ -35,6 +33,7 @@ def load_ck_datasets() -> Tuple['tf.data.Dataset', 'tf.data.Dataset']:
         image_size=CK_IMAGE_SIZE,
         color_mode=CK_COLOR_MODE,
         batch_size=BATCH_SIZE,
+        class_names=CK_EMOTION_LABELS
     )
 
     valid_ds = image_dataset_from_directory(
@@ -45,15 +44,20 @@ def load_ck_datasets() -> Tuple['tf.data.Dataset', 'tf.data.Dataset']:
         image_size=CK_IMAGE_SIZE,
         color_mode=CK_COLOR_MODE,
         batch_size=BATCH_SIZE,
+        class_names=CK_EMOTION_LABELS
     )
 
     train_ds = _normalize_dataset(train_ds)
-
     valid_ds = _normalize_dataset(valid_ds)
+
+    train_ds = train_ds.shuffle(buffer_size=1000, seed=SEED, reshuffle_each_iteration=True)
+
+    train_ds = train_ds.cache().prefetch(tf.data.AUTOTUNE)
+    valid_ds = valid_ds.cache().prefetch(tf.data.AUTOTUNE)
 
     return train_ds, valid_ds
 
-def _normalize_dataset(dataset: 'tf.data.Dataset') -> 'tf.data.Dataset':
+def _normalize_dataset(dataset: tf.data.Dataset) -> tf.data.Dataset:
     """
     Applies pixel value normalization to a TensorFlow dataset.
 

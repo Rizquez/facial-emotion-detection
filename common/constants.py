@@ -26,7 +26,7 @@ FER_FILE = os.path.join(PROJECT_ROOT, 'assets', 'FER.csv')
 # TODO: Documentation
 """
 
-CASCADE_FILE = os.path.join(PROJECT_ROOT, 'assets', 'haarcascade_frontalface_default.xml')
+MP_FACE_DETECTOR_MODEL = os.path.join(PROJECT_ROOT, 'assets', 'blaze_face_short_range.tflite')
 """
 # TODO: Documentation
 """

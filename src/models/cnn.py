@@ -5,11 +5,9 @@ from keras import optimizers
 from keras.models import Sequential
 from keras.layers import (
     Input, 
-    Conv2D, MaxPooling2D, 
-    Flatten, Dense, 
+    Conv2D, MaxPooling2D, GlobalAveragePooling2D, 
     RandomRotation, RandomFlip, RandomBrightness, 
-    BatchNormalization, 
-    Dropout
+    BatchNormalization, Dropout, Dense
 )
 
 if TYPE_CHECKING:
@@ -65,7 +63,12 @@ def build_ck_model() -> Sequential:
         MaxPooling2D(pool_size=POOL_SIZE),
         Dropout(rate=0.25),
 
-        Flatten(),
+        Conv2D(filters=128, kernel_size=KERNEL_SIZE, activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D(pool_size=POOL_SIZE),
+        Dropout(rate=0.25),
+
+        GlobalAveragePooling2D(),
         Dense(units=128, activation='relu'),
         Dropout(rate=0.5),
         Dense(units=len(CK_EMOTION_LABELS), activation='softmax')

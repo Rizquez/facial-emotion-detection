@@ -1,6 +1,7 @@
 absl-py==2.3.1
 astunparse==1.6.3
 certifi==2025.11.12
+cffi==2.0.0
 charset-normalizer==3.4.4
 flatbuffers==25.9.23
 gast==0.7.0
@@ -15,6 +16,7 @@ Markdown==3.10
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
+mediapipe==0.10.31
 ml_dtypes==0.5.4
 namex==0.1.0
 numpy==2.2.6
@@ -25,6 +27,7 @@ packaging==25.0
 pandas==2.3.3
 pillow==12.0.0
 protobuf==6.33.2
+pycparser==2.23
 Pygments==2.19.2
 python-dateutil==2.9.0.post0
 pytz==2025.2
@@ -33,6 +36,7 @@ rich==14.2.0
 scikit-learn==1.8.0
 scipy==1.16.3
 six==1.17.0
+sounddevice==0.5.3
 tensorboard==2.20.0
 tensorboard-data-server==0.7.2
 tensorflow==2.20.0

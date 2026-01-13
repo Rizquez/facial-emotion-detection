@@ -1,15 +1,12 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-from typing import TYPE_CHECKING
-from keras import optimizers
+import tensorflow as tf
 from keras.models import Model
-from keras.layers import Dense, Dropout, GlobalAveragePooling2D, Input
+from keras import optimizers, losses
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+from keras.layers import Input, Dense, Dropout, GlobalAveragePooling2D, BatchNormalization
 from keras.applications import MobileNetV2
 from keras.applications.mobilenet_v2 import preprocess_input
-
-if TYPE_CHECKING:
-    import tensorflow as tf
 # ---------------------------------------------------------------------------------------------------------------------
 
 # MODULES (INTERNAL)
@@ -37,32 +34,33 @@ def build_fer_model() -> Model:
     mobilenet_backbone = MobileNetV2(
         include_top=False,
         weights='imagenet',
-        input_tensor=preprocessed
+        input_shape=SHAPE,
+        name='mobilenetv2_backbone'
     )
 
     mobilenet_backbone.trainable = False
 
-    features = mobilenet_backbone.output
+    features = mobilenet_backbone(preprocessed, training=False)
 
-    pooled_features = GlobalAveragePooling2D()(features)
-    pooled_features = Dropout(rate=0.3)(pooled_features)
+    pooled = GlobalAveragePooling2D()(features)
+    pooled = Dropout(rate=0.3)(pooled)
 
-    dense_features = Dense(units=256, activation='relu')(pooled_features)
-    dense_features = Dropout(rate=0.3)(dense_features)
+    dense = Dense(units=256, activation='relu')(pooled)
+    dense = Dropout(rate=0.3)(dense)
 
-    outputs = Dense(units=len(FER_EMOTION_LABELS), activation='softmax')(dense_features)
+    outputs = Dense(units=len(FER_EMOTION_LABELS), activation='softmax')(dense)
 
     model = Model(inputs=inputs, outputs=outputs)
 
     model.compile(
-        optimizer=optimizers.Adam(learning_rate=1e-3),
-        loss='sparse_categorical_crossentropy',
+        optimizer=optimizers.Adam(learning_rate=3e-4),
+        loss=losses.SparseCategoricalCrossentropy(),
         metrics=['accuracy']
     )
 
     return model
 
-def train_fer_model(model: Model, train_ds: 'tf.data.Dataset', valid_ds: 'tf.data.Dataset') -> None:
+def train_fer_model(model: Model, train_ds: tf.data.Dataset, valid_ds: tf.data.Dataset) -> None:
     """
     # TODO: Documentation
     """
@@ -95,35 +93,29 @@ def train_fer_model(model: Model, train_ds: 'tf.data.Dataset', valid_ds: 'tf.dat
 
 def fine_tune_fer_model(
     model: Model, 
-    train_ds: 'tf.data.Dataset', 
-    valid_ds: 'tf.data.Dataset', 
+    train_ds: tf.data.Dataset, 
+    valid_ds: tf.data.Dataset, 
     *,
     unfreeze_last: int = 20
 ) -> None:
     """
     # TODO: Documentation
     """
-    mobilenet_backbone  = None
-    for layer in model.layers:
-        if layer.name.startswith('mobilenetv2'):
-            mobilenet_backbone  = layer
-            break
+    mobilenet_backbone  = model.get_layer('mobilenetv2_backbone')
 
-    try:
-        mobilenet_backbone  = model.get_layer('mobilenetv2_1.00_224')
-    except Exception:
-        pass
+    for layer in mobilenet_backbone.layers[:-unfreeze_last]:
+        layer.trainable = False
+    for layer in mobilenet_backbone.layers[-unfreeze_last:]:
+        layer.trainable = True
 
-    if hasattr(mobilenet_backbone , 'layers'):
-        for layer in mobilenet_backbone .layers[:-unfreeze_last]:
+    for layer in mobilenet_backbone.layers:
+        if isinstance(layer, BatchNormalization):
             layer.trainable = False
-        for layer in mobilenet_backbone .layers[-unfreeze_last:]:
-            layer.trainable = True
 
     model.compile(
         optimizer=optimizers.Adam(learning_rate=1e-5),
-        loss='sparse_categorical_crossentropy',
-        metrics=['accuracy'],
+        loss=losses.SparseCategoricalCrossentropy(),
+        metrics=['accuracy']
     )
 
     callbacks = [

@@ -65,11 +65,12 @@ Recent versions such as Python `3.12.x`, `3.13.x`, and `3.14.x` are not currentl
 
 To run the application from the console, you can use the following command shown as an example:
 ```sh
-python main.py --source=...
+python main.py --source=xxx --retrain 2>nul
 ```
 
 Where:
-- **source:** Source of data on which the model training will be performed (if necessary).
+- **--source:** Source of data on which the model training will be performed (if necessary).
+- **--retrain:** Force retraining even if weights exist.
 
 > [!NOTE]
 > For more details about the parameters and execution arguments, see the file: *main.py*
@@ -82,8 +83,8 @@ The main files are organized into:
 facial-emotion-detection/
 ├── assets
 │   ├── CK+48/...                               # Dataset containing images of human faces grouped by folder
-│   ├── FER.csv                                 # Dataset containing grayscale images, size 48×48 pixels
-│   └── haarcascade_frontalface_default.xml     # OpenCV Haar Classifier
+│   ├── blaze_face_short_range.tflite           # A lightweight model for detecting one or more faces in selfie-like images from a smartphone camera or webcam
+│   └── FER.csv                                 # Dataset containing grayscale images, size 48×48 pixels
 ├── common
 │   └── constants.py
 ├── src
@@ -124,12 +125,18 @@ class MySecondClass:
         pass
 ```
 
+### FER (CPU vs GPU)
+
+The *Kaggle notebook* used as a reference for *FER2013* uses *VGG19*. However, in my environment, the GPU is not compatible with *CUDA*, and `TensorFlow (>= 2.11)` no longer offers native GPU support on Windows, so to use the GPU, it would be necessary to work through WSL2 (or other alternatives). Due to these limitations and to avoid excessive training times on the CPU, I replaced VGG19 with a lighter model (`MobileNetV2`) while maintaining the pipeline with *CNN + CK+48 + FER*.
+
+For more information on compatible GPUs and CUDA/cuDNN requirements, check the official NVIDIA documentation (Compute Capability / CUDA on WSL).
+
 ## 📖 Additional documentation
 
-- [CK+ Kaggle](https://www.kaggle.com/code/shawon10/ck-facial-expression-detection)
-- [FER Kaggle](https://www.kaggle.com/code/enesztrk/facial-emotion-recognition-vgg19-fer2013)
-- [OpenCV Haar Cascades](https://github.com/kipr/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml)
-- [CUDA GPU Compute Capability](https://developer.nvidia.com/cuda/gpus)
+- [Kaggle - CK+](https://www.kaggle.com/code/shawon10/ck-facial-expression-detection)
+- [Kaggle - FER](https://www.kaggle.com/code/enesztrk/facial-emotion-recognition-vgg19-fer2013)
+- [Google - Face Detector](https://ai.google.dev/edge/mediapipe/solutions/vision/face_detector?hl=es-419)
+- [CUDA - GPU Compute Capability](https://developer.nvidia.com/cuda/gpus)
 
 ## 🔒 License
 

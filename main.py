@@ -1,10 +1,6 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-import os, argparse, warnings
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Silencing TensorFlow logs
-warnings.filterwarnings('ignore', category=FutureWarning) # Silencing Python future warning
-warnings.filterwarnings('ignore', category=UserWarning) # Silencing Python user warning
+import os, argparse
 # ---------------------------------------------------------------------------------------------------------------------
 
 # MODULES (INTERNAL)
@@ -18,26 +14,26 @@ from common.constants import CK_WEIGHTS_FILE, FER_WEIGHTS_FILE
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-def _train_if_needed(source: str) -> None:
+def _train_if_needed(source: str, retrain: bool) -> None:
     """
     # TODO: Documentation
     """
     source = source.lower().strip()
 
     if source == 'ck':
-        if not os.path.exists(CK_WEIGHTS_FILE):
+        if retrain or not os.path.exists(CK_WEIGHTS_FILE):
             train_ds, valid_ds = load_ck_datasets()
             model = build_ck_model()
             train_ck_model(model, train_ds, valid_ds)
         return
 
     if source == 'fer':
-        if not os.path.exists(FER_WEIGHTS_FILE):
-            train_ds, valid_ds = load_fer_datasets()
+        if retrain or not os.path.exists(FER_WEIGHTS_FILE):
+            train_ds, valid_ds, test_ds = load_fer_datasets()
             model = build_fer_model()
             train_fer_model(model, train_ds, valid_ds)
             fine_tune_fer_model(model, train_ds, valid_ds)
-            model.save_weights(FER_WEIGHTS_FILE)
+            model.evaluate(test_ds, verbose=2)
         return
 
     raise ValueError('The source parameter must be equal to `ck` or `fer`')
@@ -50,13 +46,18 @@ if __name__ == '__main__':
         '--source',
         choices=['ck', 'fer'],
         default='ck',
-        help="Model to use: CK+48 (CNN CK+) or FER (MobileNetV2 FER)"
+        help="Source of data on which the model training will be performed (if necessary)"
+    )
+
+    parser.add_argument(
+        '--retrain',
+        action='store_true',
+        help="Force retraining even if weights exist"
     )
 
     args = parser.parse_args()
 
-    _train_if_needed(args.source)
-
+    _train_if_needed(args.source, args.retrain)
     activate_webcam(args.source)
 
 # ---------------------------------------------------------------------------------------------------------------------
