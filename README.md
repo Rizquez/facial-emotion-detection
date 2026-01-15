@@ -2,21 +2,12 @@
 
 ## 🧾 Project description
 
-The main objective of the project is to design and implement a system based on convolutional neural networks (CNNs) capable of recognizing human emotions from facial images captured in real time by cameras.
-
-The system allows basic emotions such as happiness, sadness, anger, surprise, fear, disgust, and neutrality to be classified using modern computer vision and deep learning techniques. Special attention is paid to real-time performance, model accuracy, and robustness to variations in lighting and subjects.
 
 ## 📑 Context
 
-Automatic facial emotion detection is a key area within artificial intelligence and human-computer interaction, with direct applications in fields such as customer service, security, behavior analysis, and personalized recommendation systems.
-
-Recent advances in deep learning, and in particular in CNNs, have significantly improved the ability of systems to interpret facial expressions with high levels of accuracy. However, many existing approaches have limitations in real-world scenarios, especially in changing lighting conditions or when real-time processing is required.
 
 ## 🛠️ Key features
 
-- Real-time facial emotion recognition system based on video captured by camera.
-- Classification of 7 basic emotions: happiness, sadness, anger, surprise, fear, disgust, and neutral.
-- Model based on convolutional neural networks (CNNs) trained for computer vision tasks.
 
 ## 💽 Installation (Windows)
 
@@ -69,6 +60,7 @@ python main.py --source=fer --retrain 2>nul
 ```
 
 Where:
+
 - **--source:** Source of data on which the model training will be performed (if necessary).
 - **--retrain:** Force retraining even if weights exist.
 
