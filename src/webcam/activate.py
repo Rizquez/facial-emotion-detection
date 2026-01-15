@@ -65,30 +65,36 @@ def activate_webcam(source: Literal['ck', 'fer'] = 'ck') -> None:
 
     detector = mp.tasks.vision.FaceDetector.create_from_options(options)
 
-    video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(index=0)
 
     if not video_capture.isOpened():
         raise RuntimeError("The webcam could not be accessed")
     
+    start = time.monotonic()
+    last_ts = -1
+    
     while True:
-        frame_read_success, frame_bgr = video_capture.read()
-
-        if not frame_read_success:
+        ok, frame_bgr = video_capture.read()
+        if not ok:
             break
 
-        frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+        timestamp_ms = int((time.monotonic() - start) * 1000)
 
-        timestamp_ms = int(time.perf_counter() * 1000)
+        if timestamp_ms <= last_ts:
+            timestamp_ms = last_ts + 1
+
+        last_ts = timestamp_ms
+
+        frame_rgb = cv2.cvtColor(src=frame_bgr, code=cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
 
         result = detector.detect_for_video(mp_image, timestamp_ms)
 
         if not result.detections:
             probs_hist.clear()
-            cv2.imshow(...)
             continue
         
-        grayscale_frame = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
+        grayscale_frame = cv2.cvtColor(src=frame_bgr, code=cv2.COLOR_BGR2GRAY)
 
         h_image, w_image = frame_bgr.shape[:2]
 
@@ -96,10 +102,14 @@ def activate_webcam(source: Literal['ck', 'fer'] = 'ck') -> None:
             bbox = detection.bounding_box
             origin_x, origin_y, width, height = bbox.origin_x, bbox.origin_y, bbox.width, bbox.height
 
-            x1 = max(0, int(origin_x - width * MARGIN))
-            y1 = max(0, int(origin_y - height * MARGIN))
-            x2 = min(w_image, int(origin_x + width * (1 + MARGIN)))
-            y2 = min(h_image, int(origin_y + height * (1 + MARGIN)))
+            cx = origin_x + width / 2.0
+            cy = origin_y + height / 2.0
+            side = max(width, height) * (1.0 + MARGIN)
+
+            x1 = max(0, int(cx - side / 2))
+            y1 = max(0, int(cy - side / 2))
+            x2 = min(w_image, int(cx + side / 2))
+            y2 = min(h_image, int(cy + side / 2))
 
             face_gray = grayscale_frame[y1:y2, x1:x2]
             face_bgr  = frame_bgr[y1:y2, x1:x2]
@@ -158,8 +168,9 @@ def _preprocess_face_fer(bgr_face: 'ndarray') -> 'ndarray':
     """
     # TODO: Documentation
     """
-    resized = cv2.resize(src=bgr_face, dsize=FER_IMAGE_SIZE, interpolation=cv2.INTER_AREA)
-    rgb = cv2.cvtColor(src=resized, code=cv2.COLOR_BGR2RGB)
+    gray = cv2.cvtColor(src=bgr_face, code=cv2.COLOR_BGR2GRAY)
+    resized = cv2.resize(src=gray, dsize=FER_IMAGE_SIZE, interpolation=cv2.INTER_LINEAR)
+    rgb = cv2.cvtColor(src=resized, code=cv2.COLOR_GRAY2RGB)
     return np.expand_dims(rgb.astype(np.float32), axis=0)
 
 # ---------------------------------------------------------------------------------------------------------------------
