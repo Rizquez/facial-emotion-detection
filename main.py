@@ -1,6 +1,7 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
 import os, argparse
+from typing import Literal
 # ---------------------------------------------------------------------------------------------------------------------
 
 # MODULES (INTERNAL)
@@ -14,9 +15,19 @@ from common.constants import CK_WEIGHTS_FILE, FER_WEIGHTS_FILE
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-def _train_if_needed(source: str, retrain: bool) -> None:
+def _train_if_needed(source: Literal['ck', 'fer'], retrain: bool) -> None:
     """
-    # TODO: Documentation
+    Train the corresponding model if necessary, according to the indicated source.
+
+    Args:
+        source (Literal['ck', 'fer'], optional):
+            Indicates the pipeline to use: ck for CNN trained with CK+ and fer for MobileNetV2 trained with FER2013.
+        retrain (bool):
+            If True, forces retraining even if weight files exist.
+    
+    Raises:
+        ValueError:
+            If `source` is neither ck nor fer.
     """
     source = source.lower().strip()
 
@@ -33,7 +44,7 @@ def _train_if_needed(source: str, retrain: bool) -> None:
             model = build_fer_model()
             train_fer_model(model, train_ds, valid_ds)
             fine_tune_fer_model(model, train_ds, valid_ds)
-            model.evaluate(test_ds, verbose=2)
+            model.evaluate(test_ds, verbose=2) # Final evaluation on the test set (not used in training)
         return
 
     raise ValueError('The source parameter must be equal to `ck` or `fer`')
