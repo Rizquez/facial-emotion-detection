@@ -2,12 +2,111 @@
 
 ## 🧾 Project description
 
+This project implements a comprehensive real-time facial emotion detection system using deep learning and computer vision techniques.
+The system is capable of training emotion classification models from different datasets and then applying those models to images captured from a webcam, detecting faces and classifying the predominant emotion.
+
+The solution combines convolutional neural networks (CNN) for learning facial features with an efficient face detector, enabling a complete workflow from data preparation and model training to real-time inference.
+
+The project is designed with a modular and extensible architecture, facilitating experimentation with different models, datasets, and configurations.
 
 ## 📑 Context
 
+Automatic facial emotion detection is an important area within Artificial Intelligence, with applications in fields such as human-machine interaction, behavior analysis, education, health, video games, and recommendation systems.
+
+This project is a practical implementation to explore:
+
+- The training of emotion classification models based on facial images.
+- The comparison between classic CNN-based models and lighter, efficiency-oriented architectures.
+- The integration of trained models with real-time video capture systems.
+
+Due to common limitations in development environments (such as the absence of CUDA-compatible GPUs on Windows), optimized architectures were chosen that allow the system to be trained and run reasonably on CPUs, without sacrificing pipeline consistency or the overall quality of the approach.
 
 ## 🛠️ Key features
 
+- Training facial emotion detection models using different datasets.
+- Support for multiple data sources (`CK+` and `FER2013`).
+- Implementation of:
+    - Custom CNN for grayscale images.
+    - Model based on MobileNetV2 as a lightweight backbone.
+- Real-time face detection using MediaPipe.
+- Live emotion classification using the webcam.
+- Automatic image normalization and preprocessing.
+- Use of data augmentation techniques to improve model generalization.
+- Complete pipeline:
+    - Data loading
+    - Training
+    - Fine-tuning
+    - Evaluation
+    - Real-time inference
+- Modular and easy-to-extend architecture.
+- Configurable execution from the console using arguments.
+
+## 📊 Results
+
+### 🔹 Results with CK+ (custom CNN)
+
+The model trained on the **CK+** dataset uses a convolutional neural network designed specifically for small grayscale images (48×48).
+
+- **Number of classes:** 7 emotions.
+- **Dataset size:**
+    - Training: 785 images.
+    - Validation: 196 images.
+- **Training epochs:** 25.
+
+**Observed performance:**
+
+- Training accuracy remains around **23–25%** at the end of training.
+- Validation accuracy reaches values close to **24%**, with slight fluctuations between epochs.
+- The loss function shows a progressive reduction, indicating that the model learns basic patterns, albeit with limited generalization capacity.
+
+**Interpretation:**
+
+The relatively low performance is mainly due to:
+
+- The small size of the dataset.
+- The high variability between subjects and expressions.
+- Training performed exclusively on CPU.
+- The inherent complexity of classifying facial emotions with few samples.
+
+This model is mainly used as an **experimental baseline** and as support for integration into the complete real-time detection pipeline.
+
+### 🔹 Results with FER2013 (MobileNetV2)
+
+For the **FER2013** dataset, an architecture based on **MobileNetV2** pre-trained on ImageNet was used, followed by a partial fine-tuning phase.
+
+- **Number of classes:** 7 emotions.
+- **Images:** 48×48 grayscale, resized to 96×96 and converted to RGB.
+- **Initial training:** 12 epochs.
+- **Fine-tuning:** 6 epochs (unfreezing final layers).
+
+**Initial training**
+
+- Final training accuracy: **~52%**
+- Validation accuracy: **~51–52%**
+- Loss decreases steadily, showing consistent improvement between epochs.
+
+**Fine-tuning**
+
+- Final training accuracy: **~60%**
+- Final validation accuracy: **~55–56%**
+- The fine-tuning phase improves the model's ability to adapt to the specific domain of facial emotions.
+
+**Interpretation:**
+
+The use of a lightweight pre-trained backbone allows us to:
+
+- Accelerate training in environments without GPUs.
+- Obtain reasonable performance despite the noise present in the FER2013 labels.
+- Maintain a balance between accuracy and computational efficiency.
+
+This model is the main one used for real-time emotion detection via webcam.
+
+## ⚠️ Limitations
+
+- Emotion recognition is limited to the classes available in the datasets.
+- Performance may decrease in low-light conditions, with extreme head postures, if the subject has a beard, or is wearing a hat.
+- The models were trained without GPU acceleration, which limits experimentation with larger architectures.
+- FER2013 labels may contain noise due to automatic annotation.
 
 ## 💽 Installation (Windows)
 
@@ -90,7 +189,6 @@ facial-emotion-detection/
 │   │   └── mobilenetv2.py                      # MobileNetV2 (light backbone) for FER
 │   └── webcam
 │       └── activate.py
-├── .gitattributes
 ├── .gitignore
 ├── LICENSE
 ├── main.py
