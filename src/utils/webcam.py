@@ -67,7 +67,7 @@ def activate_webcam(source: Literal['ck', 'fer']) -> None:
     """
     source = source.lower().strip()
     if source not in ('ck', 'fer'):
-        raise ValueError('The `source` parameter must be equal to `ck` or `fer`')
+        raise ValueError("The `source` parameter must be equal to `ck` or `fer`")
     
     if source == 'ck':
         model = build_ck_model()
