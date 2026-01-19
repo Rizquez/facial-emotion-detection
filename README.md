@@ -155,7 +155,7 @@ Recent versions such as Python `3.12.x`, `3.13.x`, and `3.14.x` are not currentl
 
 To run the application from the console, you can use the following command shown as an example:
 ```sh
-python main.py --source=fer --retrain --evaluate 2>nul
+python main.py --source=fer --retrain --evaluate --benchmark
 ```
 
 Where:
@@ -163,6 +163,7 @@ Where:
 - **--source:** Source of data on which the model training will be performed (if necessary).
 - **--retrain:** Force retraining even if weights exist.
 - **--evaluate:** Perform offline evaluation (F1/recall/precision + confusion matrix) if applicable.
+- **--benchmark:** Measures real-time performance (FPS/latency) during webcam execution.
 
 > [!NOTE]
 > For more details about the parameters and execution arguments, see the file: *main.py*
@@ -179,6 +180,8 @@ facial-emotion-detection/
 │   └── FER.csv                                 # Dataset containing grayscale images, size 48×48 pixels
 ├── common
 │   └── constants.py
+├── handlers
+│   └── console.py
 ├── src
 │   ├── loaders
 │   │   ├── __init__.py
@@ -190,6 +193,7 @@ facial-emotion-detection/
 │   │   └── mobilenetv2.py                      # MobileNetV2 (light backbone) for FER
 │   └── utils
 │       ├── metrics.py
+│       ├── train.py
 │       └── webcam.py
 ├── .gitignore
 ├── LICENSE

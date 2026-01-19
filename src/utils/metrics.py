@@ -1,7 +1,7 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
 import numpy as np
-from typing import List, Tuple, Dict, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 from sklearn.metrics import classification_report, confusion_matrix
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-__all__ = ['offline_evaluation']
+__all__ = ['offline_evaluation', 'realtime_performance']
 
 def offline_evaluation(
     model: 'Model',
@@ -25,7 +25,7 @@ def offline_evaluation(
     labels: List[str],
     *,
     title: str = 'Assessment',
-) -> Tuple[Dict, np.ndarray]:
+) -> None:
     """
     Evaluates a multi-class classifier and generates standard metrics.
 
@@ -46,11 +46,6 @@ def offline_evaluation(
             List of class names in the same order as the model output.
         title (str, optional):
             Title to display in the console.
-
-    Returns:
-        Tuple:
-            - report_dict: Classification report in dict format.
-            - cm: Confusion matrix with shape.
     """
     y_true: List[int] = []
     y_pred: List[int] = []
@@ -63,32 +58,51 @@ def offline_evaluation(
         y_true.extend(y_batch.numpy().tolist())
         y_pred.extend(preds.tolist())
 
-    # Classification report (precision/recall/f1 per class)
-    report_dict = classification_report(
-        y_true,
-        y_pred,
-        target_names=labels,
-        output_dict=True,
-        zero_division=0,  # Avoid warnings if a class does not appear in predictions.
-    )
-
     # Confusion matrix
     cm = confusion_matrix(y_true, y_pred, labels=list(range(len(labels))))
 
-    # Console display
+    # Console display - Classification report (precision/recall/f1 per class)
     print(f"\n{'=' * 80}\n{title}\n{'=' * 80}")
     print(
         classification_report(
             y_true,
             y_pred,
             target_names=labels,
-            zero_division=0,
+            zero_division=0 # Avoid warnings if a class does not appear in predictions.
         )
     )
     print("Confusion matrix (rows=actual, columns=predicted):")
     print(cm)
 
-    return report_dict, cm
+def realtime_performance(frame_times_ms: List[float], *, title: str = 'Real-time performance') -> None:
+    """
+    Summarizes real-time performance metrics based on frame times.
+
+    Args:
+        frame_times_ms (List[float]):
+            List of frame durations. Each value must represent the total processing cycle time.
+        title (str):
+            Title to be displayed in the console.
+    """
+    if not frame_times_ms:
+        print(f"{title}: There is no time data to summarize")
+        return
+
+    arr = np.array(frame_times_ms, dtype=np.float64)
+
+    average_latency_ms = float(np.mean(arr))
+    latency_p50_ms = float(np.percentile(arr, 50))
+    latency_p95_ms = float(np.percentile(arr, 95))
+    maximum_latency_ms = float(np.max(arr))
+
+    average_fps = float(1000 / average_latency_ms) if average_latency_ms > 0 else 0.0
+
+    print(f"\n{'=' * 80}\n{title}\n{'=' * 80}")
+    print(f"Average FPS: {average_fps:.2f}")
+    print(f"Average latency (ms): {average_latency_ms:.2f}")
+    print(f"P50 latency (ms): {latency_p50_ms:.2f}")
+    print(f"P95 latency (ms): {latency_p95_ms:.2f}")
+    print(f"Max latency (ms): {maximum_latency_ms:.2f}")
 
 # ---------------------------------------------------------------------------------------------------------------------
 # END OF FILE

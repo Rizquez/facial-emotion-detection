@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 # MODULES (INTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+from src.utils.metrics import realtime_performance
 from src.models import build_ck_model, build_fer_model
 from common.constants import (
     MP_FACE_DETECTOR_MODEL,
@@ -42,7 +43,7 @@ MediaPipe returns a box fitted to the face; this margin expands the cropped regi
 This often improves the stability of the emotion classifier, especially when the detector crops too close.
 """
 
-def activate_webcam(source: Literal['ck', 'fer']) -> None:
+def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_seconds: int = 30) -> None:
     """
     Activate the webcam and run facial emotion detection in real time.
 
@@ -55,9 +56,19 @@ def activate_webcam(source: Literal['ck', 'fer']) -> None:
         6) Infer the emotion and display it on the image.
         7) Smooth predictions with a time window (moving average) to reduce flickering.
 
+    If `benchmark=True`, real-time performance metrics are calculated for `benchmark_seconds` seconds:
+        - Average FPS
+        - Average latency per frame
+        - p50/p95 percentiles
+        - Maximum latency
+
     Args:
         source (Literal['ck', 'fer'], optional):
             Indicates the pipeline to use: ck for CNN trained with CK+ and fer for MobileNetV2 trained with FER2013.
+        benchmark (bool):
+            Measures real-time performance (FPS/latency) during webcam execution.
+        benchmark_seconds (int):
+            Duration (in seconds) of the real-time benchmark.
 
     Raises:
         ValueError:
@@ -100,8 +111,14 @@ def activate_webcam(source: Literal['ck', 'fer']) -> None:
     # MediaPipe in video mode requires increasing timestamps (in milliseconds)
     start = time.monotonic()
     last_ts = -1
+
+    # Benchmark data (latency per frame in milliseconds)
+    frame_times_ms = []
+    bench_start = time.monotonic()
     
     while True:
+        t0 = time.perf_counter() # Measurement of total frame time (capture + detection + inference + drawing)
+
         ok, frame_bgr = video_capture.read()
         if not ok:
             break
@@ -124,11 +141,25 @@ def activate_webcam(source: Literal['ck', 'fer']) -> None:
         # If there are no faces, we clear the probability history (to avoid dragging)
         if not result.detections:
             probs_hist.clear()
+
+            # Frame measurement (even if there is no detection)
+            dt_ms = (time.perf_counter() - t0) * 1000.0
+            if benchmark:
+                frame_times_ms.append(dt_ms)
+
+                # Automatic cutoff by benchmark time
+                if (time.monotonic() - bench_start) >= benchmark_seconds:
+                    break
+            
+            cv2.imshow(f"Emotion detection ({source})", frame_bgr)
+            
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
             continue
         
         # We precompute the gray version for the CK pipeline
         grayscale_frame = cv2.cvtColor(src=frame_bgr, code=cv2.COLOR_BGR2GRAY)
-
         h_image, w_image = frame_bgr.shape[:2]
 
         for detection in result.detections:
@@ -191,9 +222,25 @@ def activate_webcam(source: Literal['ck', 'fer']) -> None:
 
         cv2.imshow(f"Emotion detection ({source})", frame_bgr)
 
+        # Record frame time
+        dt_ms = (time.perf_counter() - t0) * 1000.0
+        if benchmark:
+            frame_times_ms.append(dt_ms)
+
+            # Automatic time-out
+            if (time.monotonic() - bench_start) >= benchmark_seconds:
+                break
+
         # Exit the loop by pressing 'q'
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+    # Benchmark summary (if applicable)
+    if benchmark:
+        realtime_performance(
+            frame_times_ms,
+            title=f'Real-time benchmark ({source}) - {benchmark_seconds}s'
+        )
 
     # Release of resources
     detector.close()  
