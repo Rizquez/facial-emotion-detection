@@ -52,6 +52,13 @@ def obtain_args() -> 'Namespace':
         help="Measures real-time performance (FPS/latency) during webcam execution"
     )
 
+    parser.add_argument(
+        '--seconds',
+        type=int,
+        default=30,
+        help="Duration (in seconds) of the real-time benchmark, default 30 seconds"
+    )
+
     return parser.parse_args()
 
 # ---------------------------------------------------------------------------------------------------------------------

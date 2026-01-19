@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     args = obtain_args()
     train_if_needed(args.source, args.retrain, args.evaluate)
-    activate_webcam(args.source, args.benchmark)
+    activate_webcam(args.source, args.benchmark, args.seconds)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # END OF FILE

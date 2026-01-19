@@ -62,7 +62,7 @@ def offline_evaluation(
     cm = confusion_matrix(y_true, y_pred, labels=list(range(len(labels))))
 
     # Console display - Classification report (precision/recall/f1 per class)
-    print(f"\n{'=' * 80}\n{title}\n{'=' * 80}")
+    print(f"\n{'=' * 60}\n{title}\n{'=' * 60}")
     print(
         classification_report(
             y_true,
@@ -71,7 +71,7 @@ def offline_evaluation(
             zero_division=0 # Avoid warnings if a class does not appear in predictions.
         )
     )
-    print("Confusion matrix (rows=actual, columns=predicted):")
+    print(f"\n{'=' * 60}\nConfusion matrix (rows=actual, columns=predicted)\n{'=' * 60}")
     print(cm)
 
 def realtime_performance(frame_times_ms: List[float], *, title: str = 'Real-time performance') -> None:
@@ -97,7 +97,7 @@ def realtime_performance(frame_times_ms: List[float], *, title: str = 'Real-time
 
     average_fps = float(1000 / average_latency_ms) if average_latency_ms > 0 else 0.0
 
-    print(f"\n{'=' * 80}\n{title}\n{'=' * 80}")
+    print(f"\n{'=' * 60}\n{title}\n{'=' * 60}")
     print(f"Average FPS: {average_fps:.2f}")
     print(f"Average latency (ms): {average_latency_ms:.2f}")
     print(f"P50 latency (ms): {latency_p50_ms:.2f}")

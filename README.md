@@ -155,15 +155,16 @@ Recent versions such as Python `3.12.x`, `3.13.x`, and `3.14.x` are not currentl
 
 To run the application from the console, you can use the following command shown as an example:
 ```sh
-python main.py --source=fer --retrain --evaluate --benchmark
+python main.py --source=fer --evaluate --benchmark --seconds=30 --retrain
 ```
 
 Where:
 
 - **--source:** Source of data on which the model training will be performed (if necessary).
-- **--retrain:** Force retraining even if weights exist.
 - **--evaluate:** Perform offline evaluation (F1/recall/precision + confusion matrix) if applicable.
 - **--benchmark:** Measures real-time performance (FPS/latency) during webcam execution.
+- **--seconds:** Duration (in seconds) of the real-time benchmark, default 30 seconds.
+- **--retrain:** Force retraining even if weights exist.
 
 > [!NOTE]
 > For more details about the parameters and execution arguments, see the file: *main.py*
@@ -182,6 +183,8 @@ facial-emotion-detection/
 │   └── constants.py
 ├── handlers
 │   └── console.py
+├── helpers
+│   └── stdout.py
 ├── src
 │   ├── loaders
 │   │   ├── __init__.py

@@ -1,7 +1,6 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
-import cv2
-import time
+import cv2, time
 import numpy as np
 import mediapipe as mp
 from collections import deque
@@ -13,6 +12,7 @@ if TYPE_CHECKING:
 
 # MODULES (INTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+from helpers.stdout import suppress_native_output
 from src.utils.metrics import realtime_performance
 from src.models import build_ck_model, build_fer_model
 from common.constants import (
@@ -43,7 +43,7 @@ MediaPipe returns a box fitted to the face; this margin expands the cropped regi
 This often improves the stability of the emotion classifier, especially when the detector crops too close.
 """
 
-def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_seconds: int = 30) -> None:
+def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, seconds: int) -> None:
     """
     Activate the webcam and run facial emotion detection in real time.
 
@@ -56,7 +56,7 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
         6) Infer the emotion and display it on the image.
         7) Smooth predictions with a time window (moving average) to reduce flickering.
 
-    If `benchmark=True`, real-time performance metrics are calculated for `benchmark_seconds` seconds:
+    If `benchmark=True`, real-time performance metrics are calculated for `seconds`:
         - Average FPS
         - Average latency per frame
         - p50/p95 percentiles
@@ -67,7 +67,7 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
             Indicates the pipeline to use: ck for CNN trained with CK+ and fer for MobileNetV2 trained with FER2013.
         benchmark (bool):
             Measures real-time performance (FPS/latency) during webcam execution.
-        benchmark_seconds (int):
+        seconds (int):
             Duration (in seconds) of the real-time benchmark.
 
     Raises:
@@ -101,7 +101,8 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
         min_detection_confidence=0.6,
     )
 
-    detector = mp.tasks.vision.FaceDetector.create_from_options(options)
+    with suppress_native_output():
+        detector = mp.tasks.vision.FaceDetector.create_from_options(options)
 
     # Camera access (index=0 is usually the main webcam)
     video_capture = cv2.VideoCapture(index=0)
@@ -135,8 +136,8 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
         frame_rgb = cv2.cvtColor(src=frame_bgr, code=cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
 
-        # Face detection for the current frame
-        result = detector.detect_for_video(mp_image, timestamp_ms)
+        with suppress_native_output():
+            result = detector.detect_for_video(mp_image, timestamp_ms) # Face detection for the current frame
 
         # If there are no faces, we clear the probability history (to avoid dragging)
         if not result.detections:
@@ -148,7 +149,7 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
                 frame_times_ms.append(dt_ms)
 
                 # Automatic cutoff by benchmark time
-                if (time.monotonic() - bench_start) >= benchmark_seconds:
+                if (time.monotonic() - bench_start) >= seconds:
                     break
             
             cv2.imshow(f"Emotion detection ({source})", frame_bgr)
@@ -228,7 +229,7 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
             frame_times_ms.append(dt_ms)
 
             # Automatic time-out
-            if (time.monotonic() - bench_start) >= benchmark_seconds:
+            if (time.monotonic() - bench_start) >= seconds:
                 break
 
         # Exit the loop by pressing 'q'
@@ -239,7 +240,7 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, *, benchmark_
     if benchmark:
         realtime_performance(
             frame_times_ms,
-            title=f'Real-time benchmark ({source}) - {benchmark_seconds}s'
+            title=f'Real-time benchmark ({source}): {seconds} seconds'
         )
 
     # Release of resources
