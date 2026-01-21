@@ -167,7 +167,7 @@ Where:
 - **--retrain:** Force retraining even if weights exist.
 
 > [!NOTE]
-> For more details about the parameters and execution arguments, see the file: *main.py*
+> For more details about the parameters and execution arguments, see the file: *handlers/console.py*
 
 ## 📂 Project structure
 
