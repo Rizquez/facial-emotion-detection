@@ -1,5 +1,6 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+from __future__ import annotations
 import cv2, time
 import numpy as np
 import mediapipe as mp
@@ -24,8 +25,6 @@ from common.constants import (
 
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
-
-__all__ = ['activate_webcam']
 
 COLOR = (0, 255, 0)
 """
@@ -248,7 +247,7 @@ def activate_webcam(source: Literal['ck', 'fer'], benchmark: bool, seconds: int)
     video_capture.release()
     cv2.destroyAllWindows()
 
-def _preprocess_face_ck(gray_face: 'ndarray') -> 'ndarray':
+def _preprocess_face_ck(gray_face: ndarray) -> ndarray:
     """
     Preprocesses a face crop for the model trained with CK+.
 
@@ -274,7 +273,7 @@ def _preprocess_face_ck(gray_face: 'ndarray') -> 'ndarray':
     normalized = resized.astype(np.float32) / 255.0
     return normalized.reshape(1, CK_IMAGE_SIZE[0], CK_IMAGE_SIZE[1], 1)
 
-def _preprocess_face_fer(bgr_face: 'ndarray') -> 'ndarray':
+def _preprocess_face_fer(bgr_face: ndarray) -> ndarray:
     """
     Preprocesses a facial crop for the model trained with FER2013 (MobileNetV2).
 

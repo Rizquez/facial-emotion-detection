@@ -1,5 +1,6 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+from __future__ import annotations
 from typing import TYPE_CHECKING
 from keras import optimizers
 from keras.models import Sequential
@@ -107,7 +108,7 @@ def build_ck_model() -> Sequential:
 
     return model
 
-def train_ck_model(model: Sequential, train_ds: 'tf.data.Dataset', valid_ds: 'tf.data.Dataset') -> None:
+def train_ck_model(model: Sequential, train_ds: tf.data.Dataset, valid_ds: tf.data.Dataset) -> None:
     """
     Train the CNN model for the CK+ dataset and save the trained weights.
 
@@ -119,9 +120,9 @@ def train_ck_model(model: Sequential, train_ds: 'tf.data.Dataset', valid_ds: 'tf
     Args:
         model (Sequential):
             Previously built and compiled CNN model.
-        train_ds (tf.data.Dataset):
+        train_ds (DatasetV2):
             Training dataset.
-        valid_ds (tf.data.Dataset):
+        valid_ds (DatasetV2):
             Validation dataset.
     """
     model.fit(

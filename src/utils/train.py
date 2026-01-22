@@ -15,8 +15,6 @@ from common.constants import CK_WEIGHTS_FILE, FER_WEIGHTS_FILE, FER_EMOTION_LABE
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-__all__ = ['train_if_needed']
-
 def train_if_needed(source: Literal['ck', 'fer'], retrain: bool, evaluate: bool) -> None:
     """
     Train the corresponding model if necessary, according to the indicated source.

@@ -1,5 +1,6 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+from __future__ import annotations
 import numpy as np
 from typing import List, TYPE_CHECKING
 from sklearn.metrics import classification_report, confusion_matrix
@@ -17,11 +18,9 @@ if TYPE_CHECKING:
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-__all__ = ['offline_evaluation', 'realtime_performance']
-
 def offline_evaluation(
-    model: 'Model',
-    dataset: 'tf.data.Dataset',
+    model: Model,
+    dataset: tf.data.Dataset,
     labels: List[str],
     *,
     title: str = 'Assessment',
@@ -40,7 +39,7 @@ def offline_evaluation(
     Args:
         model (Model):
             Model already trained.
-        dataset (tf.data.Dataset):
+        dataset (DatasetV2):
             Dataset to be evaluated.
         labels (List[str]):
             List of class names in the same order as the model output.

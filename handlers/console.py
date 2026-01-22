@@ -1,5 +1,6 @@
 # MODULES (EXTERNAL)
 # ---------------------------------------------------------------------------------------------------------------------
+from __future__ import annotations
 from typing import TYPE_CHECKING
 from argparse import ArgumentParser
 
@@ -15,9 +16,7 @@ if TYPE_CHECKING:
 # OPERATIONS / CLASS CREATION / GENERAL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-__all__ = ['obtain_args']
-
-def obtain_args() -> 'Namespace':
+def obtain_args() -> Namespace:
     """
     Defines and processes console arguments for algorithm execution.
 
